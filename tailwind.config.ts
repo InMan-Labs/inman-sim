@@ -57,28 +57,45 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        status: {
+          success: "hsl(var(--status-success))",
+          "success-bg": "hsl(var(--status-success-bg))",
+          warning: "hsl(var(--status-warning))",
+          "warning-bg": "hsl(var(--status-warning-bg))",
+          error: "hsl(var(--status-error))",
+          "error-bg": "hsl(var(--status-error-bg))",
+          info: "hsl(var(--status-info))",
+          "info-bg": "hsl(var(--status-info-bg))",
+        },
+        severity: {
+          critical: "hsl(var(--severity-critical))",
+          "critical-bg": "hsl(var(--severity-critical-bg))",
+          high: "hsl(var(--severity-high))",
+          "high-bg": "hsl(var(--severity-high-bg))",
+          medium: "hsl(var(--severity-medium))",
+          "medium-bg": "hsl(var(--severity-medium-bg))",
+          low: "hsl(var(--severity-low))",
+          "low-bg": "hsl(var(--severity-low-bg))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        'enterprise-sm': 'var(--shadow-sm)',
+        'enterprise-md': 'var(--shadow-md)',
+        'enterprise-lg': 'var(--shadow-lg)',
+      },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
