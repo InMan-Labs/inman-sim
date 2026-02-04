@@ -9,8 +9,11 @@ import {
   initialScheduledJobs, 
   initialNotifications,
   generateExecutionResult,
-  generateAuditEntry
+  generateAuditEntry,
+  generateDirectExecutionResult,
+  generateDirectAuditEntry
 } from '@/data/initialData';
+import { historicalAuditLogs, historicalExecutionResults } from '@/data/historicalData';
 
 interface DataContextType {
   // Environment
@@ -31,6 +34,7 @@ interface DataContextType {
   // Executions
   executionResults: ExecutionResult[];
   executeRunbook: (incidentId: string, runbookId: string) => Promise<ExecutionResult>;
+  executeRunbookDirect: (runbookId: string, targetServers: string[], context: string) => Promise<ExecutionResult>;
   getExecutionResult: (id: string) => ExecutionResult | undefined;
   
   // Audit Logs
@@ -54,8 +58,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [currentEnvironment, setCurrentEnvironment] = useState<Environment>('Production');
   const [incidents, setIncidents] = useState<Incident[]>(initialIncidents);
   const [runbooks, setRunbooks] = useState<Runbook[]>(initialRunbooks);
-  const [executionResults, setExecutionResults] = useState<ExecutionResult[]>([]);
-  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
+  const [executionResults, setExecutionResults] = useState<ExecutionResult[]>(historicalExecutionResults);
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>(historicalAuditLogs);
   const [scheduledJobs, setScheduledJobs] = useState<ScheduledJob[]>(initialScheduledJobs);
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
 
@@ -190,6 +194,39 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setNotifications(prev => [newNotification, ...prev]);
   }, []);
 
+  // Execute runbook directly from Runbook Repository (not tied to an incident)
+  const executeRunbookDirect = useCallback(async (
+    runbookId: string, 
+    targetServers: string[], 
+    context: string
+  ): Promise<ExecutionResult> => {
+    const runbook = runbooks.find(r => r.id === runbookId);
+    if (!runbook) throw new Error('Runbook not found');
+
+    // Simulate execution delay
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    // Generate result
+    const result = generateDirectExecutionResult(runbook, targetServers, context, currentEnvironment);
+    setExecutionResults(prev => [result, ...prev]);
+
+    // Generate audit entry
+    const auditEntry = generateDirectAuditEntry(runbook, result, currentEnvironment);
+    setAuditLogs(prev => [auditEntry, ...prev]);
+
+    // Add notification
+    addNotification({
+      type: 'execution_completed',
+      title: 'Execution Completed',
+      message: `Runbook "${runbook.name}" completed on ${targetServers.length} server(s)`,
+      timestamp: new Date().toISOString(),
+      read: false,
+      link: `/results/${result.id}`,
+    });
+
+    return result;
+  }, [runbooks, currentEnvironment, addNotification]);
+
   return (
     <DataContext.Provider value={{
       currentEnvironment,
@@ -203,6 +240,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       getRunbook,
       executionResults,
       executeRunbook,
+      executeRunbookDirect,
       getExecutionResult,
       auditLogs,
       getAuditLog,

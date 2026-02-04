@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useData } from '@/contexts/DataContext';
 import { SeverityBadge } from '@/components/common/SeverityBadge';
+import { RunbookExecutionModal } from '@/components/runbooks/RunbookExecutionModal';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Play, Edit, Copy, Shield, CheckCircle2 } from 'lucide-react';
 
@@ -8,6 +10,7 @@ export default function RunbookDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getRunbook, addRunbook } = useData();
+  const [showExecutionModal, setShowExecutionModal] = useState(false);
 
   const runbook = getRunbook(id || '');
 
@@ -63,7 +66,7 @@ export default function RunbookDetailPage() {
               <Copy className="w-4 h-4 mr-2" />
               Duplicate
             </Button>
-            <Button>
+            <Button onClick={() => setShowExecutionModal(true)}>
               <Play className="w-4 h-4 mr-2" />
               Run
             </Button>
@@ -229,6 +232,13 @@ export default function RunbookDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Execution Modal */}
+      <RunbookExecutionModal
+        runbook={runbook}
+        open={showExecutionModal}
+        onOpenChange={setShowExecutionModal}
+      />
     </div>
   );
 }

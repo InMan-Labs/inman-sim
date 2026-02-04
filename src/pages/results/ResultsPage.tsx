@@ -72,9 +72,21 @@ export default function ResultsPage() {
       <div className="enterprise-card-elevated mb-6">
         <h2 className="text-lg font-semibold mb-4">Execution Summary</h2>
         <p className="text-muted-foreground mb-4">
-          Runbook "{result.runbookName}" was executed successfully for incident {result.incidentId}. 
-          All {result.stepsExecuted.length} steps completed without errors.
+          Runbook "{result.runbookName}" was executed {result.outcome === 'Success' ? 'successfully' : 'with issues'} 
+          {result.targetServers && result.targetServers.length > 0 
+            ? ` on ${result.targetServers.join(', ')}`
+            : ` for incident ${result.incidentId}`
+          }. 
+          {result.stepsExecuted.filter(s => s.status === 'Success').length}/{result.stepsExecuted.length} steps completed.
         </p>
+
+        {/* Execution Context if provided */}
+        {result.executionContext && (
+          <div className="mb-4 p-3 rounded-md bg-primary/5 border border-primary/10">
+            <div className="text-xs text-muted-foreground mb-1">Execution Context</div>
+            <p className="text-sm">{result.executionContext}</p>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-3 rounded-md bg-muted/50">
@@ -106,6 +118,20 @@ export default function ResultsPage() {
             <p className="font-semibold">{result.stepsExecuted.length} completed</p>
           </div>
         </div>
+
+        {/* Target Servers if provided */}
+        {result.targetServers && result.targetServers.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-border">
+            <div className="text-xs text-muted-foreground mb-2">Target Servers</div>
+            <div className="flex flex-wrap gap-2">
+              {result.targetServers.map((server) => (
+                <span key={server} className="px-2 py-1 text-xs font-mono bg-muted rounded border">
+                  {server}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Steps Executed */}
