@@ -211,10 +211,10 @@ export function getDashboardStats() {
   const failedExecutions = prodLogs.filter(l => l.outcome === 'Failure').length;
   
   // Calculate MTTR (Mean Time To Resolution) - simulated at ~42 minutes
-  const avgMTTR = 42;
+  const avgMTTR = 113;
   
   // Calculate time saved (15 min saved per automated execution vs manual)
-  const timeSavedMinutes = totalIncidents * 100; // 100 min avg saved per execution
+  const timeSavedMinutes = totalIncidents * 127; // 100 min avg saved per execution
   const timeSavedHours = Math.round(timeSavedMinutes / 60);
   
   // Runbook usage stats
