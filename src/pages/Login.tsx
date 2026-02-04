@@ -25,7 +25,7 @@ export default function Login() {
     const success = login(username, password);
     
     if (success) {
-      navigate('/orchestration');
+      navigate('/dashboard');
     } else {
       setError('Invalid credentials. Please try again.');
     }
