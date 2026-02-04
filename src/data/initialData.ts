@@ -1,6 +1,6 @@
 import { 
   Incident, Runbook, ScheduledJob, Notification, 
-  ExecutionResult, AuditLogEntry 
+  ExecutionResult, AuditLogEntry, Environment 
 } from '@/types';
 
 export const initialIncidents: Incident[] = [
@@ -480,6 +480,77 @@ export function generateAuditEntry(incident: Incident, runbook: Runbook, result:
     timestamp: result.endTime,
     environment: incident.environment,
     incidentId: incident.id,
+    runbookName: runbook.name,
+    approvedBy: result.approvedBy,
+    executedBy: result.executedBy,
+    outcome: result.outcome,
+    executionId: result.id,
+  };
+}
+
+// Generate execution result for direct runbook execution (from Runbook Repository)
+export function generateDirectExecutionResult(
+  runbook: Runbook, 
+  targetServers: string[], 
+  executionContext: string,
+  environment: Environment
+): ExecutionResult {
+  const now = new Date();
+  const startTime = new Date(now.getTime() - 45000);
+  
+  return {
+    id: `EXEC-${Date.now()}`,
+    incidentId: `DIRECT-${Date.now()}`,
+    runbookId: runbook.id,
+    runbookName: runbook.name,
+    environment,
+    runnerId: `runner-${targetServers[0]}`,
+    approvedBy: 'Admin User',
+    executedBy: 'Admin User',
+    startTime: startTime.toISOString(),
+    endTime: now.toISOString(),
+    duration: '45s',
+    outcome: 'Success',
+    targetServers,
+    executionContext: executionContext || undefined,
+    stepsExecuted: runbook.steps.map((step, index) => ({
+      stepId: step.id,
+      description: step.description,
+      status: 'Success' as const,
+      output: `Step ${index + 1} completed successfully on ${targetServers.join(', ')}`,
+      duration: `${Math.floor(Math.random() * 10) + 2}s`,
+    })),
+    executionLogs: [
+      `[${startTime.toISOString()}] Execution started`,
+      `[${startTime.toISOString()}] Target servers: ${targetServers.join(', ')}`,
+      executionContext ? `[${startTime.toISOString()}] Context: ${executionContext}` : '',
+      `[${startTime.toISOString()}] Pre-checks passed`,
+      ...runbook.steps.map((step, i) => 
+        `[${new Date(startTime.getTime() + (i + 1) * 10000).toISOString()}] ${step.description} - OK`
+      ),
+      `[${now.toISOString()}] Post-checks passed`,
+      `[${now.toISOString()}] Execution completed successfully`,
+    ].filter(Boolean),
+    systemLogs: [
+      `[INFO] Authentication verified for user: Admin User`,
+      `[INFO] Target servers: ${targetServers.join(', ')}`,
+      `[INFO] Environment: ${environment}`,
+      `[INFO] Runbook version: 1.2.3`,
+      `[INFO] Policy compliance: SOC2, ISO27001 - PASSED`,
+      `[INFO] Least-privilege check: PASSED`,
+    ],
+    rawOutput: runbook.steps.map((step, i) => 
+      `=== Step ${i + 1}: ${step.description} ===\nServers: ${targetServers.join(', ')}\nAction: ${step.action}\nParameters: ${JSON.stringify(step.parameters)}\nResult: Success\nOutput: Operation completed\n`
+    ).join('\n'),
+  };
+}
+
+export function generateDirectAuditEntry(runbook: Runbook, result: ExecutionResult, environment: Environment): AuditLogEntry {
+  return {
+    id: `AUDIT-${Date.now()}`,
+    timestamp: result.endTime,
+    environment,
+    incidentId: result.incidentId,
     runbookName: runbook.name,
     approvedBy: result.approvedBy,
     executedBy: result.executedBy,

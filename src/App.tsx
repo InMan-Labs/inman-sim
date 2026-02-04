@@ -11,6 +11,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 // Pages
 import Login from "@/pages/Login";
 import Profile from "@/pages/Profile";
+import DashboardPage from "@/pages/dashboard/DashboardPage";
 import OrchestrationPage from "@/pages/orchestration/OrchestrationPage";
 import IncidentDetailPage from "@/pages/orchestration/IncidentDetailPage";
 import ResultsPage from "@/pages/results/ResultsPage";
@@ -39,7 +40,8 @@ const App = () => (
               {/* Protected routes */}
               <Route element={<ProtectedRoute />}>
                 <Route element={<AppLayout />}>
-                  <Route path="/" element={<Navigate to="/orchestration" replace />} />
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/orchestration" element={<OrchestrationPage />} />
                   <Route path="/orchestration/:id" element={<IncidentDetailPage />} />
                   <Route path="/results/:id" element={<ResultsPage />} />

@@ -1,8 +1,9 @@
-import { Activity, BookOpen, FileText, Calendar } from 'lucide-react';
+import { LayoutDashboard, Activity, BookOpen, FileText, Calendar } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 const navItems = [
+  { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { name: 'Orchestration', path: '/orchestration', icon: Activity },
   { name: 'Runbooks', path: '/runbooks', icon: BookOpen },
   { name: 'Audit Logs', path: '/audit-logs', icon: FileText },

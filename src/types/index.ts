@@ -68,6 +68,8 @@ export interface ExecutionResult {
   endTime: string;
   duration: string;
   outcome: 'Success' | 'Partial' | 'Failure';
+  targetServers?: string[];
+  executionContext?: string;
   stepsExecuted: Array<{
     stepId: string;
     description: string;

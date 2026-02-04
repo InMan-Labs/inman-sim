@@ -2,14 +2,18 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '@/contexts/DataContext';
 import { SeverityBadge } from '@/components/common/SeverityBadge';
+import { RunbookExecutionModal } from '@/components/runbooks/RunbookExecutionModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, BookOpen, Calendar } from 'lucide-react';
+import { Runbook } from '@/types';
 
 export default function RunbooksPage() {
   const { runbooks } = useData();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRunbook, setSelectedRunbook] = useState<Runbook | null>(null);
+  const [showExecutionModal, setShowExecutionModal] = useState(false);
 
   const filteredRunbooks = runbooks.filter(rb =>
     rb.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -22,6 +26,12 @@ export default function RunbooksPage() {
       day: 'numeric',
       year: 'numeric',
     });
+  };
+
+  const handleRun = (runbook: Runbook, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedRunbook(runbook);
+    setShowExecutionModal(true);
   };
 
   return (
@@ -88,10 +98,7 @@ export default function RunbooksPage() {
               <Button 
                 size="sm" 
                 className="flex-1"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/runbooks/${runbook.id}?action=run`);
-                }}
+                onClick={(e) => handleRun(runbook, e)}
               >
                 Run
               </Button>
@@ -104,6 +111,15 @@ export default function RunbooksPage() {
         <div className="enterprise-card text-center py-12">
           <p className="text-muted-foreground">No runbooks found matching your search</p>
         </div>
+      )}
+
+      {/* Execution Modal */}
+      {selectedRunbook && (
+        <RunbookExecutionModal
+          runbook={selectedRunbook}
+          open={showExecutionModal}
+          onOpenChange={setShowExecutionModal}
+        />
       )}
     </div>
   );
